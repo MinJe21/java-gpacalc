@@ -1,16 +1,14 @@
 package gpacalc;
 
 import java.util.ArrayList;
-import java.util.Scanner;
+import static camp.nextstep.edu.missionutils.Console.readLine;
+import camp.nextstep.edu.missionutils.Console;
 
 public class Application {
-    //scanner 호출
-    private static final Scanner keyboard = new Scanner(System.in);
-
     //질문 및 입력받는 함수
     public static String inputValue(String question){
         System.out.println(question);
-        return keyboard.nextLine();
+        return Console.readLine();
     }
 
     //항목에 맞게 스필릿 후 저장
@@ -19,7 +17,13 @@ public class Application {
             throw new IllegalArgumentException("input is empty");
         }
 
-        String[] subjects = input.split(",");
+        String[] subjects;
+        if(input.contains(",")){
+            subjects = input.split(",");
+        }
+        else{
+            subjects = new String[]{input};
+        }
 
         for (String subject : subjects) {
             String[] parts = subject.split("-");
@@ -38,8 +42,8 @@ public class Application {
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("credit part must be an integer");
             }
-            if (credit < 1) {
-                throw new IllegalArgumentException("학점은 1점 이상이어야 합니다. -> " + credit);
+            if (credit < 1 || credit > 4) {
+                throw new IllegalArgumentException("credit part must be an integer at 1 to 4");
             }
 
             //gradeSymbol 유효성 검사
@@ -108,39 +112,35 @@ public class Application {
 
     public static void main(String[] args) {
         ArrayList<Gpa> gpaList = new ArrayList<>();
-        try {
-            // 전공 입력
-            String inputMajor = inputValue("전공 과목명과 이수학점, 평점을 입력해주세요(예시: 프로그래밍언어론-3-A+,소프트웨어공학-3-B+): ");
-            addSubjects(gpaList, inputMajor, "[전공]");
+        // 전공 입력
+        String inputMajor = inputValue("전공 과목명과 이수학점, 평점을 입력해주세요(예시: 프로그래밍언어론-3-A+,소프트웨어공학-3-B+): ");
+        addSubjects(gpaList, inputMajor, "[전공]");
+        System.out.println();
 
-            System.out.println();
+        // 교양 입력
+        String inputGeneralEducation = inputValue("교양 과목명과 이수학점, 평점을 입력해주세요(예시: 선형대수학-3-C0,인간관계와자기성장-3-P): ");
+        addSubjects(gpaList, inputGeneralEducation, "[교양]");
+        System.out.println();
 
-            // 교양 입력
-            String inputGeneralEducation = inputValue("교양 과목명과 이수학점, 평점을 입력해주세요(예시: 선형대수학-3-C0,인간관계와자기성장-3-P): ");
-            addSubjects(gpaList, inputGeneralEducation, "[교양]");
-
-            // 과목목록 출력
-            System.out.println("<과목 목록>");
-            for (Gpa gpa : gpaList) {
-                System.out.println(gpa.toString());
-            }
-
-            // 취득학점 출력
-            System.out.println("<취득학점>");
-            System.out.println(earnedCredits(gpaList) + "학점");
-
-            // 평점평균 출력
-            System.out.println("<평점평균>");
-            System.out.println(String.format("%.2f", averageGrade(gpaList)) + " / 4.5");
-
-            // 전공 평점평균 출력
-            System.out.println("<전공 평점평균>");
-            System.out.println(String.format("%.2f", majorAverageGrade(gpaList)) + " / 4.5");
-
-        } catch (IllegalArgumentException e) {
-            System.out.println("\n[오류] " + e.getMessage());
-            System.out.println("프로그램을 종료합니다.");
-            return;
+        // 과목목록 출력
+        System.out.println("<과목 목록>");
+        for (Gpa gpa : gpaList) {
+            System.out.println(gpa.toString());
         }
+        System.out.println();
+
+        // 취득학점 출력
+        System.out.println("<취득학점>");
+        System.out.println(earnedCredits(gpaList) + "학점");
+        System.out.println();
+
+        // 평점평균 출력
+        System.out.println("<평점평균>");
+        System.out.println(String.format("%.2f", averageGrade(gpaList)) + " / 4.5");
+        System.out.println();
+
+        // 전공 평점평균 출력
+        System.out.println("<전공 평점평균>");
+        System.out.println(String.format("%.2f", majorAverageGrade(gpaList)) + " / 4.5");
     }
 }
